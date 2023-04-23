@@ -47,10 +47,48 @@ class ShowImageAdapter(
             .load(imageModel.url)
             .into(holder.image)*/
 
+        holder.itemView.setOnLongClickListener(OnLongClickListener {
+            showDialog(imageModel)
+            true
+        })
 
 
     }
-    
+
+    private fun showDialog(imageModel: ImageModel) {
+        val firebaseStorage = FirebaseStorage.getInstance().getReference("images")
+        val databaseRef = FirebaseDatabase.getInstance().getReference("images")
+
+        MaterialAlertDialogBuilder(context)
+            .setTitle("Delete Banner")
+            .setMessage("Do you want to delete this banner ?")
+            .setNegativeButton("No", object : DialogInterface.OnClickListener{
+                override fun onClick(dialog: DialogInterface?, which: Int) {
+                    dialog?.dismiss()
+                }
+            })
+            .setPositiveButton("Yes",object : DialogInterface.OnClickListener{
+                override fun onClick(dialog: DialogInterface?, which: Int) {
+                    firebaseStorage.storage.getReferenceFromUrl(imageModel.url!!).delete().addOnSuccessListener(object : OnSuccessListener<Void>{
+                        override fun onSuccess(p0: Void?) {
+                            Toast.makeText(context, "Banner deleted", Toast.LENGTH_SHORT).show()
+
+                            databaseRef.child(imageModel.imageId.toString()).removeValue()
+                            imageList.remove(imageModel)
+
+                        }
+                    })
+                        .addOnFailureListener(object :OnFailureListener{
+                            override fun onFailure(p0: Exception) {
+
+                            }
+
+                        })
+                }
+
+            }).show()
+    }
+
 
 
     override fun getItemCount(): Int {
