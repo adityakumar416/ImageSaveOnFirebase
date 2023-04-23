@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+   >
+
+    <!-- creating text view for displaying heading-->
+
+
+    <!-- creating an image view for displaying image-->
+    <ImageView
+        android:id="@+id/user_image"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:background="@drawable/upload"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:padding="3dp" />
+
+    <!-- creating a button to choose image-->
+
+
+    <!-- creating a button to upload image-->
+    <Button
+        android:id="@+id/btn_upload_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/user_image"
+        android:layout_margin="10dp"
+        android:padding="4dp"
+        android:text="Upload Image"
+        android:textAllCaps="false" />
+
+    <TextView
+        android:id="@+id/show_image"
+        android:layout_below="@id/btn_upload_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:gravity="center"
+        android:textSize="20dp"
+        android:text="Show Image" />
+
+
+</RelativeLayout>
