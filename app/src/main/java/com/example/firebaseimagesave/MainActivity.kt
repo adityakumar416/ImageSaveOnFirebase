@@ -4,35 +4,42 @@ import android.app.Activity
 import android.app.ProgressDialog
 import android.content.ContentResolver
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
+import android.view.animation.AnimationUtils
 import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.example.firebaseimagesave.NetworkReceiver.Companion.networkReceiverListener
 import com.example.firebaseimagesave.databinding.ActivityMainBinding
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import java.io.IOException
+import kotlin.text.Typography.amp
 
 
 class MainActivity : AppCompatActivity() {
     // creating variable for buttons, image view and Uri for file.
     private var firebaseStorage: FirebaseStorage? = null
     private var firebaseDatabase: FirebaseDatabase? = null
-
+    private var networkReceiver: NetworkReceiver? = null
     private lateinit var uri:Uri
     private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        setupNetworkListener()
         // on below line initializing variables for buttons and image view.
 
 
@@ -174,4 +181,40 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+
+    private fun setupNetworkListener() {
+        NetworkReceiver.networkReceiverListener =
+            object : NetworkReceiver.NetworkReceiverListener {
+                override fun onNetworkConnectionChanged(isConnected: Boolean) {
+                    toggleNoInternetBar(!isConnected)
+                }
+            }
+    }
+
+    private fun toggleNoInternetBar(display: Boolean) {
+        if (display) {
+            val enterAnim = AnimationUtils.loadAnimation(this, R.anim.enter_from_bottom)
+            binding.noInternetBar.startAnimation(enterAnim)
+        } else {
+            val exitAnim = AnimationUtils.loadAnimation(this, R.anim.exit_to_bottom)
+            binding.noInternetBar.startAnimation(exitAnim)
+        }
+        binding.noInternetBar.visibility = if (display) View.VISIBLE else View.GONE
+    }
+
+    override fun onStart() {
+        super.onStart()
+        networkReceiver = NetworkReceiver()
+        registerReceiver(networkReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+    }
+
+    override fun onStop() {
+        super.onStop()
+        networkReceiver?.let {
+            unregisterReceiver(it) }
+    }
+
+
+
 }
