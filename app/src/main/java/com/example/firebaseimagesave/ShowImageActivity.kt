@@ -15,39 +15,16 @@ class ShowImageActivity : AppCompatActivity() {
     private lateinit var binding: ActivityShowImageBinding
     private lateinit var imageList: ArrayList<ImageModel>
     private var isGridView = true
-    private lateinit var adapter: ShowImageAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityShowImageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        adapter = ShowImageAdapter(imageList,this@ShowImageActivity) // Replace getData() with your data source
-        binding.recyclerview.adapter = adapter
-
-        binding.toggleIcon.setOnClickListener {
-            // Toggle between grid and list view
-            isGridView = !isGridView
-
-            if (isGridView) {
-                // Switch to GridLayoutManager
-                val gridLayoutManager = GridLayoutManager(this, 2) // 2 columns in the grid
-                binding.recyclerview.layoutManager = gridLayoutManager
-            } else {
-                // Switch to LinearLayoutManager (List View)
-                val linearLayoutManager = LinearLayoutManager(this)
-                binding.recyclerview.layoutManager = linearLayoutManager
-            }
-
-            // Notify the adapter about the layout change
-            adapter.notifyDataSetChanged()
-        }
-
-        binding.recyclerview.layoutManager = LinearLayoutManager(this)
         imageList = arrayListOf()
 
-        val gridLayoutManager = GridLayoutManager(this, 2) // 2 columns in the grid
-        binding.recyclerview.layoutManager = gridLayoutManager
+        binding.iconView.text = "List View"
+
 
         val databaseReference = FirebaseDatabase.getInstance().getReference("images")
         databaseReference.addValueEventListener(object : ValueEventListener{
@@ -62,12 +39,18 @@ class ShowImageActivity : AppCompatActivity() {
                         }
 
                     }
+              //  binding.recyclerview.layoutManager = LinearLayoutManager(this@ShowImageActivity)
+                binding.recyclerview.layoutManager = GridLayoutManager(this@ShowImageActivity, 2)
 
-
-                binding.recyclerview.layoutManager = LinearLayoutManager(this@ShowImageActivity,RecyclerView.VERTICAL,false)
 
                 binding.recyclerview.adapter = ShowImageAdapter(imageList,this@ShowImageActivity)
+                binding.recyclerview.adapter = ShowGridViewImageAdapter(imageList,this@ShowImageActivity)
+
+
+
                 }
+
+
 
             override fun onCancelled(error: DatabaseError) {
                     Toast.makeText(this@ShowImageActivity,error.toString(),Toast.LENGTH_SHORT).show()
@@ -76,7 +59,27 @@ class ShowImageActivity : AppCompatActivity() {
 
         })
 
+       /* adapter = ItemAdapter(items)
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = GridLayoutManager(this, 2)
+*/
+        // On icon click, switch between grid and list view
+        binding.iconView.setOnClickListener {
+            if (isGridView) {
+                binding.recyclerview.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL,false)
+             //   binding.iconView.setImageResource(R.drawable.ic_grid_view)
+                binding.recyclerview.adapter = ShowImageAdapter(imageList,this@ShowImageActivity)
+                binding.iconView.text = "Grid View"
 
+            } else {
+                binding.recyclerview.layoutManager = GridLayoutManager(this, 2)
+              //  binding.iconView.setImageResource(R.drawable.ic_list_view)
+                binding.recyclerview.adapter = ShowGridViewImageAdapter(imageList,this@ShowImageActivity)
+                binding.iconView.text = "List View"
+
+            }
+            isGridView = !isGridView
+        }
 
     }
 }
